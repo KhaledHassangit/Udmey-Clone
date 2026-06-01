@@ -1,0 +1,334 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum CourseStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL_LEVELS
+}
+
+enum LessonType {
+  VIDEO
+  TEXT
+}
+
+enum VideoProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  REFUNDED
+  EXPIRED
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  emailVerified Boolean    @default(false)
+  name          String?
+  image         String?
+  role          UserRole   @default(STUDENT)
+  status        UserStatus @default(ACTIVE)
+  bio           String?    @db.Text
+  locale        String     @default("en")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  courses       Course[]       @relation("InstructorCourses")
+  enrollments   Enrollment[]
+  lessonProgress LessonProgress[]
+  comments      Comment[]
+  reviews       Review[]
+  systemLogs    SystemLog[]    @relation("ActorLogs")
+  moderatedComments Comment[]  @relation("ModeratedComments")
+
+  @@index([role])
+  @@index([status])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?   @db.Text
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  icon        String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  courses Course[]
+
+  @@index([slug])
+}
+
+model Course {
+  id              String       @id @default(cuid())
+  title           String
+  slug            String       @unique
+  description     String       @db.Text
+  shortDescription String?     @db.VarChar(500)
+  thumbnail       String?
+  promoVideoKey   String?
+  price           Decimal      @default(0) @db.Decimal(10, 2)
+  currency        String       @default("USD")
+  difficulty      Difficulty   @default(ALL_LEVELS)
+  status          CourseStatus @default(DRAFT)
+  rejectionReason String?      @db.Text
+  instructorId    String
+  categoryId      String?
+  averageRating   Float        @default(0)
+  reviewCount     Int          @default(0)
+  enrollmentCount Int          @default(0)
+  publishedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  instructor  User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  category    Category?    @relation(fields: [categoryId], references: [id])
+  sections    Section[]
+  enrollments Enrollment[]
+  reviews     Review[]
+
+  @@index([instructorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([slug])
+  @@index([averageRating])
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  courseId  String
+  title     String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@index([courseId])
+}
+
+model Lesson {
+  id          String     @id @default(cuid())
+  sectionId   String
+  title       String
+  slug        String
+  description String?    @db.Text
+  type        LessonType @default(VIDEO)
+  content     String?    @db.Text
+  duration    Int        @default(0)
+  sortOrder   Int        @default(0)
+  isPreview   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  section    Section          @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  videoAsset VideoAsset?
+  progress   LessonProgress[]
+  comments   Comment[]
+
+  @@unique([sectionId, slug])
+  @@index([sectionId])
+}
+
+model VideoAsset {
+  id               String                @id @default(cuid())
+  lessonId         String                @unique
+  originalKey      String
+  hlsManifestKey   String?
+  processingStatus VideoProcessingStatus @default(PENDING)
+  processingError  String?               @db.Text
+  duration         Int                   @default(0)
+  qualities        String[]              @default([])
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+model Enrollment {
+  id        String           @id @default(cuid())
+  userId    String
+  courseId  String
+  status    EnrollmentStatus @default(ACTIVE)
+  progress  Float            @default(0)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model LessonProgress {
+  id             String   @id @default(cuid())
+  userId         String
+  lessonId       String
+  watchedSeconds Int      @default(0)
+  completed      Boolean  @default(false)
+  lastWatchedAt  DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+}
+
+model Comment {
+  id          String    @id @default(cuid())
+  lessonId    String
+  userId      String
+  parentId    String?
+  content     String    @db.Text
+  isHidden    Boolean   @default(false)
+  moderatedBy String?
+  moderatedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  lesson    Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  moderator User?     @relation("ModeratedComments", fields: [moderatedBy], references: [id])
+
+  @@index([lessonId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  courseId  String
+  userId    String
+  rating    Int
+  content   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+  @@index([rating])
+}
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  level     String
+  action    String
+  message   String   @db.Text
+  metadata  Json?
+  actorId   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  actor User? @relation("ActorLogs", fields: [actorId], references: [id])
+
+  @@index([level])
+  @@index([createdAt])
+  @@index([actorId])
+}
+
+model VideoAccessToken {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId, lessonId])
+}

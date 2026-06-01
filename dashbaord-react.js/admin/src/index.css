@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #08080c;
+  --surface: #111118;
+  --border: rgba(255, 255, 255, 0.06);
+  --accent: #22d3ee;
+  --accent-dim: rgba(34, 211, 238, 0.12);
+  --danger: #f43f5e;
+  --warn: #fbbf24;
+  --text: #e4e4e7;
+  --muted: #71717a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono {
+  font-family: "IBM Plex Mono", monospace;
+}

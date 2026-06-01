@@ -1,0 +1,53 @@
+{
+  "brand": "Lumina",
+  "nav": {
+    "explore": "Explore",
+    "myLearning": "My Learning",
+    "teach": "Teach",
+    "signIn": "Sign in",
+    "getStarted": "Get started"
+  },
+  "home": {
+    "heroTitle": "Learn without limits.",
+    "heroSubtitle": "Premium courses with cinema-quality streaming. Pick up exactly where you left off.",
+    "ctaExplore": "Browse courses",
+    "ctaStart": "Start learning free",
+    "featured": "Featured this week",
+    "continueWatching": "Continue watching",
+    "categories": "Browse by topic"
+  },
+  "auth": {
+    "signIn": "Welcome back",
+    "signUp": "Create your account",
+    "email": "Email",
+    "password": "Password",
+    "otp": "Enter verification code",
+    "sendOtp": "Send code",
+    "verifyOtp": "Verify",
+    "orContinue": "Or continue with",
+    "google": "Google",
+    "github": "GitHub"
+  },
+  "course": {
+    "enroll": "Enroll now",
+    "preview": "Preview",
+    "lessons": "lessons",
+    "students": "students",
+    "rating": "rating",
+    "curriculum": "Curriculum",
+    "reviews": "Reviews",
+    "instructor": "Instructor"
+  },
+  "dashboard": {
+    "title": "My Learning",
+    "progress": "Your progress",
+    "enrolled": "Enrolled courses",
+    "empty": "You haven't enrolled yet. Explore courses to begin."
+  },
+  "instructor": {
+    "studio": "Creator Studio",
+    "createCourse": "New course",
+    "analytics": "Performance",
+    "students": "Students"
+  }
+}

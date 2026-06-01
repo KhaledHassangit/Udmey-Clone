@@ -1,0 +1,53 @@
+{
+  "brand": "لومينا",
+  "nav": {
+    "explore": "استكشف",
+    "myLearning": "تعلّمي",
+    "teach": "علّم",
+    "signIn": "تسجيل الدخول",
+    "getStarted": "ابدأ الآن"
+  },
+  "home": {
+    "heroTitle": "تعلّم بلا حدود.",
+    "heroSubtitle": "دورات متميزة بجودة بث سينمائية. تابع من حيث توقفت.",
+    "ctaExplore": "تصفح الدورات",
+    "ctaStart": "ابدأ التعلم مجاناً",
+    "featured": "مميز هذا الأسبوع",
+    "continueWatching": "متابعة المشاهدة",
+    "categories": "تصفح حسب الموضوع"
+  },
+  "auth": {
+    "signIn": "مرحباً بعودتك",
+    "signUp": "أنشئ حسابك",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "otp": "أدخل رمز التحقق",
+    "sendOtp": "إرسال الرمز",
+    "verifyOtp": "تحقق",
+    "orContinue": "أو تابع عبر",
+    "google": "جوجل",
+    "github": "جيت هب"
+  },
+  "course": {
+    "enroll": "سجّل الآن",
+    "preview": "معاينة",
+    "lessons": "دروس",
+    "students": "طلاب",
+    "rating": "تقييم",
+    "curriculum": "المنهج",
+    "reviews": "المراجعات",
+    "instructor": "المدرب"
+  },
+  "dashboard": {
+    "title": "تعلّمي",
+    "progress": "تقدمك",
+    "enrolled": "الدورات المسجّلة",
+    "empty": "لم تسجّل بعد. استكشف الدورات للبدء."
+  },
+  "instructor": {
+    "studio": "استوديو المبدع",
+    "createCourse": "دورة جديدة",
+    "analytics": "الأداء",
+    "students": "الطلاب"
+  }
+}

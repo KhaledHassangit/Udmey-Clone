@@ -1,0 +1,18 @@
+{
+  "name": "lumina-learn-monorepo",
+  "private": true,
+  "workspaces": [
+    "udemy",
+    "dashbaord-react.js/admin"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=udemy",
+    "dev:admin": "npm run dev --workspace=dashbaord-react.js/admin",
+    "build": "npm run build --workspace=udemy && npm run build --workspace=dashbaord-react.js/admin",
+    "db:generate": "npm run db:generate --workspace=udemy",
+    "db:push": "npm run db:push --workspace=udemy",
+    "db:migrate": "npm run db:migrate --workspace=udemy",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  }
+}
